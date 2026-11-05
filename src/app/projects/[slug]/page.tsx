@@ -7,10 +7,10 @@ import { getProject, projects } from "@/data/projects";
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }));
 }
-
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const project = getProject(params.slug);
-  if (!project) return {};
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const project = getProject(slug);
+ if (!project) return {};
   return {
     title: project.title,
     description: project.summary,
@@ -18,9 +18,10 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function ProjectPage({ params }: { params: { slug: string } }) {
-  const project = getProject(params.slug);
-  if (!project) notFound();
+export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const project = getProject(slug);
+ if (!project) notFound();
 
   const index = projects.findIndex((p) => p.slug === project.slug);
   const next = projects.length > 1 ? projects[(index + 1) % projects.length] : null;

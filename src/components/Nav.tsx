@@ -10,25 +10,36 @@ export default function Nav() {
   const onHome = pathname === "/";
   const [active, setActive] = useState("home");
   const [open, setOpen] = useState(false);
+ useEffect(() => {
+  if (!onHome) return;
+  const ids = nav.map((n) => n.id);
+  let frame = 0;
 
-  useEffect(() => {
-    if (!onHome) return;
-    const targets = nav
-      .map((n) => document.getElementById(n.id))
-      .filter((el): el is HTMLElement => el !== null);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        }
-      },
-      { rootMargin: "-45% 0px -45% 0px" },
-    );
-    targets.forEach((t) => observer.observe(t));
-    return () => observer.disconnect();
-  }, [onHome]);
+  const update = () => {
+    frame = 0;
+    const line = window.innerHeight * 0.35;
+    let current = ids[0];
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= line) current = id;
+    }
+    const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 4;
+    setActive(atBottom ? ids[ids.length - 1] : current);
+  };
 
-  useEffect(() => {
+  const onScroll = () => {
+    if (!frame) frame = requestAnimationFrame(update);
+  };
+
+  update();
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  return () => {
+    window.removeEventListener("scroll", onScroll);
+    window.removeEventListener("resize", onScroll);
+    if (frame) cancelAnimationFrame(frame);
+  };
+}, [onHome]); useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
