@@ -1,4 +1,5 @@
 # Brian Muigai | Portfolio
+![CI](https://github.com/BrianGMuigai/portfolio/actions/workflows/ci.yml/badge.svg)`
 
 Personal portfolio of Brian Muigai, a backend engineer in Nairobi. Built with Next.js (App Router), TypeScript and Tailwind CSS.
 
